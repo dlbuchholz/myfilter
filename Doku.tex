@@ -1,0 +1,310 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[catalan]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{amsthm}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{pgfplots}% This uses tikz
+\pgfplotsset{compat=newest}% use newest version
+\usepackage{sidecap}
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+\usepackage{xcolor}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{array,amsfonts}
+\usepackage{setspace}
+\captionsetup{justification=centering}
+\usetikzlibrary{plotmarks}
+\usepackage[left=2.2cm,right=2.2cm,top=3cm,bottom=2.5cm]{geometry}
+
+% Definició de colors
+\definecolor{blue2}{HTML}{206B99}
+\hypersetup{colorlinks=true, linkcolor=blue2}
+
+% Commandes útils
+\DeclareMathOperator{\nim}{nim}
+\newcommand{\hs}{\hspace{3pt}}
+\newcommand{\sii}{\hspace{3pt} \Leftrightarrow \hspace{3pt}}
+\newcommand{\implica}{\hspace{3pt} \Rightarrow \hspace{3pt}}
+\newcommand\myfunc[5]{%
+  \begingroup
+  \setlength\arraycolsep{0pt}
+  #1\colon\begin{array}[t]{c >{{}}c<{{}} l}
+             #2 & \to & #3 \\ #4 & \mapsto & #5 
+          \end{array}%
+  \endgroup}
+
+% Vectors i matrius
+\newcommand{\mb}{\left( \begin{matrix}}
+\newcommand{\me}{\end{matrix} \right)}
+
+% Títol i subtítol
+\newcommand{\Title}[1]{\begin{center}\begin{LARGE}#1\vspace{8pt}\end{LARGE}\end{center}}
+\newcommand{\SubTitle}[1]{\begin{center}#1\vspace{20pt}\end{center}}
+
+% Espaiat entre línies
+\doublespacing
+
+% Inserció de codis
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{white},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize\ttfamily,breaklines=true,
+    breakatwhitespace=false, 
+    xleftmargin=20pt, 
+    xrightmargin=20pt,       
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    framextopmargin=50pt,
+    frame=bottomline,
+    basicstyle=\footnotesize\ttfamily,
+    language=Octave
+}
+
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{CStyle}{
+    backgroundcolor=\color{backgroundColour},   
+    commentstyle=\color{mGreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{mGray},
+    stringstyle=\color{mPurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=C
+}
+
+
+\lstset{style=CStyle}
+
+% Capçalera a pàgines 2...*
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Dennis Lucas Buchholz}
+\lhead{Dokumentation: Filter in C}
+\cfoot{\thepage}
+\thispagestyle{plain}
+\begin{document}
+\begin{spacing}{1}
+
+\Title{Dokumentation der Implementation eines Filters in C}
+
+
+\section{Einleitung}
+
+In dieser Dokumentation wird die Implementation einer Aufgabe in der Programmiersprache C beschrieben. Inhalt dieser Aufgabe ist es, ein Filterprogramm zu
+programmieren bei welchem es möglich ist, einen Dateinamen als Parameter in dem Programm einzulesen, diese Datei zu öffnen. Letztlich soll durch die Übergabe von Parametern es ermöglicht werden, die \textbf{Wörter}, \textbf{Zeichen} und \textbf{Zeilen}  der vorliegenden Zeichenkette zu zählen und das Ergebnis in die Standard-Ausgabe zu schreiben. Die Funktionalität dieses Filters ist
+mit der des Werkzeugs \texttt{wc} in UNIX-Systemen vergleichbar.
+
+Zur Kompilierung und Testen des Quelltextes wurde der Kompilierer \textbf{gcc} in der Version 9.2.0 aus MinGW verwendet. Für die Erstellung der Dokumentation wurde \textbf{TeXworks} verwendet.
+
+\subsection{Angeforderte Parameter}
+
+\begin{itemize}
+\item -c \quad $\>$ zähle alle Zeichen
+\item -w \quad zähle alle Wörter
+\item -l \quad $\>$ zähle alle Zeilen
+\item -i \quad $\>$ Angabe des zu lesenden Dateipfads
+\end{itemize}
+
+\section{Struktur des Programms}
+\subsection{Erkennen der Parameter und Flags}
+
+Zunächst gilt es zu erkennen, welche Operationen von dem Programm durchgeführt werden sollen. Hierzu wird eine Struktur verwendet, welcher die Intentionen des Benutzers als Flags zwischenspeichert.
+
+\begin{lstlisting}
+struct mode {
+    int characters;
+    int words;
+    int lines;  
+};
+\end{lstlisting}
+
+Die verwendete Struktur \texttt{mode} wird global definiert und besitzt drei Attribute des Typs \texttt{int}, welche jeweils angeben, ob der Nutzer \textbf{Zeichen}, \textbf{Wörter} oder \textbf{Zeilen} zählen möchte. Diese Attribute können unabhgängig voneinander auf 1 (true) gesetzt sein und werden daher verwendet um die gesetzten Flags zu erfassen.
+
+\begin{lstlisting}
+struct mode flags;
+flags.characters = 0;
+flags.words = 0;
+flags.lines = 0;
+\end{lstlisting}
+
+Die Struktur wird zu Beginn der Startfunktion \texttt{main} mit der Bezeichnung {\it flags\/} deklariert und mit den Standardwerten initialisier. Somit existiert nun eine Instanz der Struktur mode, in welcher die Intentionen des Benutzers im Verlauf des Programmes gespeichert und gelesen werden können.  
+Zu Beginn der \texttt{main} Funktion wird ebenso eine Variable des Typs int mit der Bezeichnung option deklariert, in welcher das gerade erkannte Programmargument zwischengespeichert wird. 
+
+\begin{lstlisting}[style=CStyle]
+while((option = getopt(argc, argv, "cwli")) != -1 ) {
+        switch (option) {
+            case 'c':
+            flags.characters = 1; 
+            break;
+            case 'w':
+            flags.words = 1; 
+            break;
+            case 'l':
+            flags.lines = 1;
+            break;
+            case 'i':
+            if (access(optarg, F_OK) == 0 )
+                file_name = optarg;
+        }
+}
+\end{lstlisting}
+
+In der Bedingung der {\it while\/} Schleife wird der Variable {\it option\/} der Rückgabewert von \texttt{getopt} zugewiesen. Mit Hilfe der {\it while\/} Schleife wird bei jedem Durchlauf der Schleife ein Argument erkannt. In dem Kontext dieses Programmes prüfen wir in der {\it switch-case\/}  Abfrage ob `c`, `w` oder `l` als Argumente erkannt wurden. Sollten sie erkannt worden sein, so wird das jeweilige Attribut der Struktur {\it intention\/} auf wahr gesetzt.
+
+Die \texttt{getopt} Funktion der Bibliothek unistd.h erwartet drei Parameter: die Anzahl der Argumente des Programms, ein Array welches die Argumente beinhaltet und eine Zeichenkette welche angibt, welche Argumente zugelassen werden.
+
+Die {\it while\/} Schleife ist erst beendet, wenn der Rückgabewert der \texttt{getopt} Funktion -1 beträgt, welches bedeutet, dass keine weiteren Parameter mehr vorliegen.
+
+\subsection{Lesen der Eingabe}
+
+\begin{lstlisting}[style=CStyle]
+char* file_name = "";
+FILE* file = stdin;
+\end{lstlisting}
+
+Zu Beginn der \texttt{main} Funktion wird eine Zeigervariable mit der Bezeichnung file\_name deklariert und mit einer leeren Zeichenkette initialisiert. In dieser Variable kann im Verlauf des Programms der Name der Datei zwischengespeichert werden, welche gelesen werden soll.
+Des Weiteren wird eine Zeigervariable mit dem Typ FILE deklariert, welche standardmäßig auf den Standard-Input zeigt.
+
+\begin{lstlisting}[style=CStyle]
+if (file_name == "")
+	if (access(argv[argc-1], F_OK) == 0 )
+           	 file_name = argv[argc-1];
+\end{lstlisting}
+
+Es gilt den Dateinamen zu erkennen, auch wenn das Argument -i nicht an den Programmaufruf übergeben wurde. Hierzu wird die Funktion access der Bibliothek unistd.h verwendet. Diese Funktion erwartet zwei Parameter: den Dateipfad und den zu überprüfenden Sachverhalt. Im Kontext dieses Programms prüft diese Funktion nun, ob das letzte Argument welches übergeben wurde eine valide Datei ist. Sollte es sich um eine valide Datei handeln, so wird dessen Name in der Variable file\_name zwischengespeichert. 
+
+\begin{lstlisting}[style=CStyle]
+if (flags.characters || flags.words || flags.lines) {
+    if(file_name != "")
+        file = fopen(file_name, "r");
+\end{lstlisting}
+Es wird überprüft ob mindestens eine der Flags gesetzt wurde (Zeichen, Wörter oder Zeilen müssen gezählt werden), ansonsten wird die Hilfeseite angezeigt.
+Wenn ein valider Dateiname angegeben wurde, wird dem Dateizeiger die Datei zugewiesen, welche sich an dem Pfad von file\_name befindet. Diese Seite wird anschließend mit Schreibrechten geöffnet.
+
+\begin{lstlisting}[style=CStyle]
+fclose(file);
+\end{lstlisting}
+Anschließend muss die Datei noch geschlossen werden, sobald das Zählen beendet wurde.
+
+\begin{lstlisting}[style=CStyle]
+else {
+	display_usage();
+	free(buffer);
+	return 0;
+}
+\end{lstlisting}
+
+Ist weder eine Datei übergeben worden, noch eine Eingabe über Standard-Input geschehen, so gilt es die Hilfeseite anzuzeigen.
+\section{Implementierung der Zählung}
+\label{Implementierung der Zählung}
+\index{Implementierung der Zählung}
+
+\begin{lstlisting}[style=CStyle]
+int characters = 0, words = 1, lines = 0;
+\end{lstlisting}
+
+Die Zähler für \textbf{Wörter}, \textbf{Zeichen} und \textbf{Zeilen} werden am Anfang der Main-Funktion als Variablen des Typs int deklariert und initialisiert.
+Der Zähler für Wörter wird mit dem Wert 1 initialisiert, da Wörter immer mit einem Leerzeichen getrennt werden und somit immer ein Wort mehr als die Anzahl der Trennungszeichen vorliegen muss.
+
+\begin{lstlisting}[style=CStyle]
+int c = getc(file);
+\end{lstlisting}
+
+Es wird eine Variable c mit dem Typ int deklariert in welcher das zu prüfende Zeichen gespeichert wird. Ihr wird bei der Initialisierung das ersten Zeichen der Datei zugewiesen.
+
+\begin{lstlisting}[style=CStyle]
+while(c != EOF) {
+    characters++;
+     if (c == '\n') lines++;
+     else if (c == ' ') words++;
+     c = getc(file);
+ }
+\end{lstlisting}
+
+Jedes Zeichen der Datei wird iteriert, bis das Ende der Datei (EOF) erreicht wurde. Bei jedem Durchlauf wird die Anzahl der Zeichen erhöht. Der Zeilenzähler wird erhöht, sobald ein Newline-Zeichen gefunden wurde, und der Wortzähler wird erhöht, sobald ein Leerzeichen gefunden wurde. Zuletzt wird der Variable c das nächste Zeichen der Datei zugewiesen.
+
+\begin{lstlisting}[style=CStyle]
+if(flags.characters) printf("%d characters\n", characters);
+if(flags.words) printf("%d words\n", words);
+if(flags.lines) printf("%d lines\n", lines);
+printf("%d lines\n", count_lines(buffer, strlen(buffer)));
+\end{lstlisting}
+
+Zuletzt wird überprüft, ob in der Struktur {\it flags\/} die Attribute {\it characters\/} (Zeichen), {\it words\/}(Wörter) oder {\it lines\/}(Zeilen) auf wahr gesetzt sind.
+Sollten sie auf wahr gesetzt sein, so wird die dazugehörige Funktion aufgerufen.
+
+
+\section{Auswertung der Ergebnisse}
+
+Für die Erprobung der einzelnen Funktionen dieses Programms wurde mit der in der Aufgabe vorliegenden Textdatei {\it 7zara10.txt\/} gearbeitet. Wird das vorliegende Programm unter Windows (mit den vorher angeführten Werkzeugen) kompiliert und ausgeführt, so erfolgt die folgende Ausgabe:
+\begin{lstlisting}[language=bash]
+$ a.exe -c -w -l -i 7zara10.txt
+523940 characters
+81058 words
+4612 lines   
+\end{lstlisting}
+
+Der selbe Programmaufruf funktioniert ebenso wenn der Parameter -i ausgelassen wird:
+\begin{lstlisting}[language=bash]
+$ a.exe -c -w -l 7zara10.txt
+523940 characters
+81058 words
+4612 lines     
+\end{lstlisting}
+
+Des Weiteren kann das Programm die Zeichen, Wörter und Zeilen zählen, wenn aus dem Standard-Input gelesen wird:
+
+\begin{lstlisting}[language=bash]
+$ cat 7zara10.txt | a.exe -c -w -l
+523940 characters
+81058 words
+4612 lines     
+\end{lstlisting}
+
+Bei \emph{unterschiedlichen} Implementationen des Programms dieser Aufgabe kann es zu unterschiedlichen Ergebnissen bei der \emph{selben} Eingabedatei kommen. 
+Dies liegt darin begründet, dass unterschiedliche Implementationen verschiedene Anforderungen an die Zählung stellen.
+\end{spacing}
+\end{document}
